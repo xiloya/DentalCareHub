@@ -1,0 +1,35 @@
+/* Custom styles for authentication pages */
+
+.auth-page-wrapper {
+  position: relative;
+}
+
+.auth-one-bg-position {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.shape svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  position: relative;
+  background-image: url('./dental.jpg'); /* Replace with your image path */
+  background-size: cover; /* Adjust as needed */
+  background-position: center; /* Adjust as needed */
+}
+
+.auth-page-content {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-logo h2 {
+  font-weight: bold;
+  color: white;
+  font-style: italic;
+  text-align: center;
+}
