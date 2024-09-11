@@ -1,15 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Import axios for HTTP requests
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./auth.css"; // Custom styles if needed
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Vous pouvez ajouter ici la logique de validation et d'authentification
-    navigate('/calendar');
+
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/token/", {
+        email,
+        password,
+      });
+
+      const { token } = response.data;
+
+      if (rememberMe) {
+        localStorage.setItem("token", token);
+      } else {
+        sessionStorage.setItem("token", token);
+      }
+
+      // Redirect to the calendar page after successful login
+      navigate("/calendar");
+    } catch (error) {
+      console.error("Error during login:", error);
+      // You can add an alert or error message to the user here
+    }
   };
 
   return (
@@ -51,28 +74,28 @@ const SignIn = () => {
                 <div className="card-body p-4">
                   <div className="text-center mt-2">
                     <h5 className="text-primary">Welcome Back!</h5>
-                    <p className="text-muted">Sign in to continue to DentalCare.</p>
+                    <p className="text-muted">
+                      Sign in to continue to DentalCare.
+                    </p>
                   </div>
                   <div className="p-2 mt-4">
                     <form onSubmit={handleSubmit}>
                       <div className="mb-3">
-                        <label htmlFor="username" className="form-label">
-                          Username <span className="text-danger">*</span>
+                        <label htmlFor="email" className="form-label">
+                          Email <span className="text-danger">*</span>
                         </label>
                         <input
-                          type="text"
+                          type="email"
                           className="form-control"
-                          id="username"
+                          id="email"
                           name="email"
-                          placeholder="Enter username"
+                          placeholder="Enter email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
                         />
                       </div>
                       <div className="mb-3">
-                        <div className="float-end">
-                          <a href="/password/reset" className="text-muted">
-                            Forgot password?
-                          </a>
-                        </div>
                         <label className="form-label" htmlFor="password-input">
                           Password <span className="text-danger">*</span>
                         </label>
@@ -83,14 +106,10 @@ const SignIn = () => {
                             name="password"
                             placeholder="Enter password"
                             id="password-input"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
                           />
-                          <button
-                            className="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon"
-                            type="button"
-                            id="password-addon"
-                          >
-                            <i className="ri-eye-fill align-middle"></i>
-                          </button>
                         </div>
                       </div>
                       <div className="form-check">
@@ -98,8 +117,13 @@ const SignIn = () => {
                           className="form-check-input"
                           type="checkbox"
                           id="auth-remember-check"
+                          checked={rememberMe}
+                          onChange={() => setRememberMe(!rememberMe)}
                         />
-                        <label className="form-check-label" htmlFor="auth-remember-check">
+                        <label
+                          className="form-check-label"
+                          htmlFor="auth-remember-check"
+                        >
                           Remember me
                         </label>
                       </div>
@@ -108,13 +132,11 @@ const SignIn = () => {
                           Sign In
                         </button>
                       </div>
-                      
                     </form>
                   </div>
                 </div>
-              </div>
-              <div className="mt-4 text-center">
-                <p className="mb-0">
+
+                <p className="mb-0  text-center">
                   Don't have an account?{" "}
                   <a
                     href="/register"

@@ -2,18 +2,21 @@ from rest_framework import serializers
 from .models import User, Patient, Dentist, Appointment, Notes, Invoice
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False)
-
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'age', 'phone_number', 'address', 'role', 'password']
+        fields = ['email', 'password', 'first_name', 'last_name', 'dob', 'phone_number', 'address']
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        user = User.objects.create_user(**validated_data)
-        if password:
-            user.set_password(password)
-            user.save()
+        user = User.objects.create_user(
+            email=validated_data['email'],
+            password=validated_data['password'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+            dob=validated_data.get('dob', None),
+            phone_number=validated_data.get('phone_number', ''),
+            address=validated_data.get('address', '')
+        )
         return user
 
     def update(self, instance, validated_data):
@@ -34,7 +37,7 @@ class PatientSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        user_data['role'] = 'patient'
+      
         user = User.objects.create_user(**user_data)
         patient = Patient.objects.create(user=user, **validated_data)
         return patient
@@ -62,7 +65,7 @@ class DentistSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        user_data['role'] = 'dentist'
+       
         user = User.objects.create_user(**user_data)
         dentist = Dentist.objects.create(user=user, **validated_data)
         return dentist

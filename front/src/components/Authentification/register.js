@@ -2,18 +2,21 @@ import React, { useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./auth.css";
+import { FaUser, FaTooth } from "react-icons/fa"; // Importing icons
 
 const Register = () => {
+  const [role, setRole] = useState(null);
   const [formData, setFormData] = useState({
-    username: "",
     email: "",
     first_name: "",
     last_name: "",
-    age: "",
+    dob: "",
     phone_number: "",
     address: "",
     password: "",
-    role: "patient", // Default role set to patient, can be changed to dentist
+    confirm_password: "",
+    specialization: "", // For dentists
+    medical_history: "", // For patients
   });
 
   const [error, setError] = useState(null);
@@ -28,13 +31,18 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    // Prevent sending confirm_password to the backend
+    const { confirm_password, ...dataToSend } = formData;
+
+    const url =
+      role === "dentist"
+        ? "http://127.0.0.1:8000/register/dentist/"
+        : "http://127.0.0.1:8000/register/patient/";
+
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/register/",
-        formData
-      );
+      const response = await axios.post(url, dataToSend);
       console.log("Registration successful", response.data);
-      // Redirect or clear form if needed
     } catch (error) {
       console.error("Registration failed", error);
       setError("Registration failed. Please try again.");
@@ -60,219 +68,250 @@ const Register = () => {
           </svg>
         </div>
       </div>
-      <div className="auth-page-content">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="text-center mt-sm-5 mb-4 text-white-50">
-                <div>
-                  <a href="/login" className="d-inline-block auth-logo">
-                    <b></b>
-                  </a>
-                </div>
-                <p className="mt-3 fs-15 fw-medium">Dentalcare Website</p>
-              </div>
+
+      {role === null ? (
+        <div className="role-popup">
+          <div className="popup-content">
+            <h5>Select Your Role</h5>
+            <div className="role-buttons">
+              <button
+                className="btn btn-primary"
+                onClick={() => setRole("dentist")}
+              >
+                <FaTooth className="me-2" /> Dentist
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setRole("patient")}
+              >
+                <FaUser className="me-2" /> Patient
+              </button>
             </div>
           </div>
-          <div className="row justify-content-center">
-            <div className="col-md-8 col-lg-6 col-xl-5">
-              <div className="card mt-4">
-                <div className="card-body p-4">
-                  <div className="text-center mt-2">
-                    <h5 className="text-primary">Create New Account</h5>
-                    <p className="text-muted">
-                      Get your free DentalCare account now
-                    </p>
+        </div>
+      ) : (
+        <div className="auth-page-content">
+          <div className="container">
+            <div className="row justify-content-center">
+              <div className="col-md-8 col-lg-6 col-xl-5">
+                <div className="card mt-4">
+                  <div className="card-body p-4">
+                    <div className="text-center mt-2">
+                      <h5 className="text-primary">Create New Account</h5>
+                      <p className="text-muted">
+                        Get your free DentalCare account now
+                      </p>
+                    </div>
+                    <div className="p-2 mt-4">
+                      <form
+                        className="needs-validation"
+                        noValidate
+                        onSubmit={handleSubmit}
+                      >
+                        <div className="mb-3">
+                          <label htmlFor="useremail" className="form-label">
+                            Email <span className="text-danger">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            className="form-control"
+                            name="email"
+                            id="useremail"
+                            placeholder="Enter email address"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                          />
+                          <div className="invalid-feedback">
+                            Please enter email
+                          </div>
+                        </div>
+
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="first_name" className="form-label">
+                              First Name <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="first_name"
+                              id="first_name"
+                              placeholder="Enter first name"
+                              value={formData.first_name}
+                              onChange={handleChange}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label htmlFor="last_name" className="form-label">
+                              Last Name <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="last_name"
+                              id="last_name"
+                              placeholder="Enter last name"
+                              value={formData.last_name}
+                              onChange={handleChange}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mb-3">
+                          <label htmlFor="dob" className="form-label">
+                            Date of Birth
+                          </label>
+                          <input
+                            type="date"
+                            className="form-control"
+                            name="dob"
+                            id="dob"
+                            placeholder="Enter date of birth"
+                            value={formData.dob}
+                            onChange={handleChange}
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <label htmlFor="phone_number" className="form-label">
+                            Phone Number <span className="text-danger">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            name="phone_number"
+                            id="phone_number"
+                            placeholder="Enter phone number"
+                            value={formData.phone_number}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <label htmlFor="address" className="form-label">
+                            Address
+                          </label>
+                          <textarea
+                            className="form-control"
+                            name="address"
+                            id="address"
+                            placeholder="Enter address"
+                            value={formData.address}
+                            onChange={handleChange}
+                          />
+                        </div>
+
+                        {role === "dentist" && (
+                          <div className="mb-3">
+                            <label
+                              htmlFor="specialization"
+                              className="form-label"
+                            >
+                              Specialization
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              name="specialization"
+                              id="specialization"
+                              placeholder="Enter specialization"
+                              value={formData.specialization}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        )}
+
+                        {role === "patient" && (
+                          <div className="mb-3">
+                            <label
+                              htmlFor="medical_history"
+                              className="form-label"
+                            >
+                              Medical History
+                            </label>
+                            <textarea
+                              className="form-control"
+                              name="medical_history"
+                              id="medical_history"
+                              placeholder="Enter medical history"
+                              value={formData.medical_history}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        )}
+
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <label
+                              htmlFor="userpassword"
+                              className="form-label"
+                            >
+                              Password <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="password"
+                              className="form-control"
+                              name="password"
+                              id="userpassword"
+                              placeholder="Enter password"
+                              value={formData.password}
+                              onChange={handleChange}
+                              required
+                            />
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <label
+                              htmlFor="confirm_password"
+                              className="form-label"
+                            >
+                              Confirm Password{" "}
+                              <span className="text-danger">*</span>
+                            </label>
+                            <input
+                              type="password"
+                              className="form-control"
+                              name="confirm_password"
+                              id="confirm_password"
+                              placeholder="Confirm password"
+                              value={formData.confirm_password}
+                              onChange={handleChange}
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {error && (
+                          <div className="error text-danger mt-2">{error}</div>
+                        )}
+
+                        <div className="mt-4">
+                          <button
+                            className="btn btn-primary w-100"
+                            type="submit"
+                          >
+                            Register
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
-                  <div className="p-2 mt-4">
-                    <form
-                      className="needs-validation"
-                      noValidate
-                      onSubmit={handleSubmit}
-                    >
-                      <div className="mb-3">
-                        <label htmlFor="useremail" className="form-label">
-                          Email <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          className="form-control"
-                          name="email"
-                          id="useremail"
-                          placeholder="Enter email address"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required
-                        />
-                        <div className="invalid-feedback">
-                          Please enter email
-                        </div>
-                      </div>
-                      <div className="mb-3">
-                        <label htmlFor="username" className="form-label">
-                          Username <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="username"
-                          id="username"
-                          placeholder="Enter username"
-                          value={formData.username}
-                          onChange={handleChange}
-                          required
-                        />
-                        <div className="invalid-feedback">
-                          Please enter username
-                        </div>
-                      </div>
-                      <div className="mb-3">
-                        <label htmlFor="first_name" className="form-label">
-                          First Name <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="first_name"
-                          id="first_name"
-                          placeholder="Enter first name"
-                          value={formData.first_name}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label htmlFor="last_name" className="form-label">
-                          Last Name <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="last_name"
-                          id="last_name"
-                          placeholder="Enter last name"
-                          value={formData.last_name}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label htmlFor="age" className="form-label">
-                          Age
-                        </label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          name="age"
-                          id="age"
-                          placeholder="Enter age"
-                          value={formData.age}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label htmlFor="phone_number" className="form-label">
-                          Phone Number <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="phone_number"
-                          id="phone_number"
-                          placeholder="Enter phone number"
-                          value={formData.phone_number}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label htmlFor="address" className="form-label">
-                          Address
-                        </label>
-                        <textarea
-                          className="form-control"
-                          name="address"
-                          id="address"
-                          placeholder="Enter address"
-                          value={formData.address}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label htmlFor="userpassword" className="form-label">
-                          Password <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="password"
-                          className="form-control"
-                          name="password"
-                          id="userpassword"
-                          placeholder="Enter password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          required
-                        />
-                        <div className="invalid-feedback">
-                          Please enter password
-                        </div>
-                      </div>
-                      <div className="mb-3">
-                        <label htmlFor="role" className="form-label">
-                          Role <span className="text-danger">*</span>
-                        </label>
-                        <select
-                          className="form-control"
-                          name="role"
-                          id="role"
-                          value={formData.role}
-                          onChange={handleChange}
-                          required
-                        >
-                          <option value="dentist">Dentist</option>
-                          <option value="patient">Patient</option>
-                        </select>
-                      </div>
-                      <div className="mt-3">
-                        <button className="btn btn-success w-100" type="submit">
-                          Sign Up
-                        </button>
-                      </div>
-                      {error && (
-                        <p className="error text-danger mt-2">{error}</p>
-                      )}
-                    </form>
-                  </div>
+
+                  <p className="mb-0 text-center">
+                    Already have an account?{" "}
+                    <a href="/login" className="fw-semibold text-primary">
+                      Sign In
+                    </a>
+                  </p>
                 </div>
-              </div>
-              <div className="mt-4 text-center">
-                <p className="mb-0">
-                  Already have an account?{" "}
-                  <a
-                    href="/login"
-                    className="fw-semibold text-primary text-decoration-underline"
-                  >
-                    Sign In
-                  </a>
-                </p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <footer className="footer">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="text-center">
-                <p className="mb-0 text-muted">
-                  &copy; {new Date().getFullYear()} DentalCare Nacl{" "}
-                  <i className="mdi mdi-heart text-danger"></i>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      )}
     </div>
   );
 };

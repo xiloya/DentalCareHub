@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import './calendar.css';
+import React, { useState, useEffect } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import "./calendar.css";
 
 const Calendar = () => {
   const [events, setEvents] = useState([]);
   const [modalInfo, setModalInfo] = useState({
     isOpen: false,
     event: {
-      start: '',
-      title: '',
-      age: '',
-      description: '',
+      start: "",
+      title: "",
+      age: "",
+      description: "",
     },
   });
 
@@ -21,9 +21,9 @@ const Calendar = () => {
       isOpen: true,
       event: {
         start: info.dateStr,
-        title: '',
-        age: '',
-        description: '',
+        title: "",
+        age: "",
+        description: "",
       },
     });
   };
@@ -35,8 +35,8 @@ const Calendar = () => {
         id: info.event.id,
         start: info.event.startStr,
         title: info.event.title,
-        age: info.event.extendedProps.age || '',
-        description: info.event.extendedProps.description || '',
+        age: info.event.extendedProps.age || "",
+        description: info.event.extendedProps.description || "",
       },
     });
   };
@@ -44,19 +44,26 @@ const Calendar = () => {
   const handleEventSave = () => {
     const { id, start, title, age, description } = modalInfo.event;
     if (id) {
-      setEvents(events.map(event => (event.id === id ? { id, start, title, age, description } : event)));
+      setEvents(
+        events.map((event) =>
+          event.id === id ? { id, start, title, age, description } : event
+        )
+      );
     } else {
-      setEvents([...events, { id: events.length + 1, start, title, age, description }]);
+      setEvents([
+        ...events,
+        { id: events.length + 1, start, title, age, description },
+      ]);
     }
-    console.log('Events after save:', events);
+    console.log("Events after save:", events);
     closeModal();
   };
 
   const handleEventDelete = () => {
     const { id } = modalInfo.event;
-    const updatedEvents = events.filter(event => event.id !== id);
+    const updatedEvents = events.filter((event) => event.id !== id);
     setEvents(updatedEvents);
-    console.log('Events after delete:', updatedEvents);
+    console.log("Events after delete:", updatedEvents);
     closeModal();
   };
 
@@ -64,17 +71,17 @@ const Calendar = () => {
     setModalInfo({
       isOpen: false,
       event: {
-        start: '',
-        title: '',
-        age: '',
-        description: '',
+        start: "",
+        title: "",
+        age: "",
+        description: "",
       },
     });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setModalInfo(prevModalInfo => ({
+    setModalInfo((prevModalInfo) => ({
       ...prevModalInfo,
       event: {
         ...prevModalInfo.event,
@@ -84,7 +91,7 @@ const Calendar = () => {
   };
 
   useEffect(() => {
-    console.log('Current events:', events);
+    console.log("Current events:", events);
   }, [events]);
 
   return (
@@ -98,10 +105,12 @@ const Calendar = () => {
       />
 
       {modalInfo.isOpen && (
-        <div className="modal" style={{ display: 'block' }}>
+        <div className="modal" style={{ display: "block" }}>
           <div className="modal-content">
-            <span className="close" onClick={closeModal}>&times;</span>
-            <h2>{modalInfo.event.id ? 'Edit ' : 'make an appointment'}</h2>
+            <span className="close" onClick={closeModal}>
+              &times;
+            </span>
+            <h2>{modalInfo.event.id ? "Edit " : "make an appointment"}</h2>
             <form>
               <div>
                 <label>Name: </label>
@@ -131,10 +140,14 @@ const Calendar = () => {
               </div>
               <div>
                 <button type="button" onClick={handleEventSave}>
-                  {modalInfo.event.id ? 'Update' : 'Add'}
+                  {modalInfo.event.id ? "Update" : "Add"}
                 </button>
                 {modalInfo.event.id && (
-                  <button type="button" className="delete" onClick={handleEventDelete}>
+                  <button
+                    type="button"
+                    className="delete"
+                    onClick={handleEventDelete}
+                  >
                     Delete
                   </button>
                 )}
